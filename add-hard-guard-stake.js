@@ -37,13 +37,12 @@ const GUARD_BLOCK = `
     return null;
   }
 
-  // Переписать существующие ссылки
   document.querySelectorAll('a[href]').forEach(function(a){
     var next = map(a.getAttribute('href')||'');
     if (next) a.setAttribute('href', next);
   });
 
-  // Перехват кликов (capture)
+ 
   ['click','pointerdown','mousedown','mouseup','auxclick','touchstart','touchend'].forEach(function(t){
     document.addEventListener(t, function(e){
       var a = e.target && e.target.closest ? e.target.closest('a[href]') : null;
@@ -56,7 +55,7 @@ const GUARD_BLOCK = `
     }, true);
   });
 
-  // Следим за динамически добавленными ссылками
+  
   new MutationObserver(function(ms){
     ms.forEach(function(m){
       if (m.type==='attributes' && m.attributeName==='href' && m.target.tagName==='A'){
@@ -76,7 +75,7 @@ const GUARD_BLOCK = `
     });
   }).observe(document.documentElement, {subtree:true, childList:true, attributes:true, attributeFilter:['href']});
 
-  // Перехватываем window.open
+
   try{
     var _open = window.open;
     window.open = function(url,name,spec){
@@ -86,7 +85,7 @@ const GUARD_BLOCK = `
     };
   }catch(_){}
 
-  // Перехватываем location.assign / replace
+ 
   try{
     var _assign = window.location.assign.bind(window.location);
     var _replace = window.location.replace.bind(window.location);
