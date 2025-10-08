@@ -1,41 +1,42 @@
-
 const fs = require('fs');
 const path = require('path');
 const cheerio = require('cheerio');
 
 const FILE = path.resolve('./mine-site/index.html');
 
-
 const STAKE_BASE = 'http://localhost:8001/';
 
 if (!fs.existsSync(FILE)) {
-  console.error('Не найден файл:', FILE);
-  process.exit(1);
+	console.error('Не найден файл:', FILE);
+	process.exit(1);
 }
 
 const html = fs.readFileSync(FILE, 'utf8');
 const $ = cheerio.load(html, { decodeEntities: false });
 
-
-$('script,style').filter((_, el) => {
-  const t = $(el).html() || '';
-  const m = $(el).attr('id') || '';
-  return /MAIN GUARD|BURGER|mirror-burger|mirror-main-burger|panel wire|MAIN ENHANCE/i.test(t + m);
-}).remove();
+$('script,style')
+	.filter((_, el) => {
+		const t = $(el).html() || '';
+		const m = $(el).attr('id') || '';
+		return /MAIN GUARD|BURGER|mirror-burger|mirror-main-burger|panel wire|MAIN ENHANCE/i.test(
+			t + m
+		);
+	})
+	.remove();
 
 $('script[src*="mirror-controls.js"]').remove();
 
-
 let ctas = [];
 $('a[href],button').each((_, el) => {
-  const $el = $(el);
-  const href = ($el.attr('href') || '').trim();
-  const txt  = ($el.text() || '').trim().toLowerCase();
-  const looksStake = /https?:\/\/(www\.)?stake\.lido\.fi/i.test(href) || /(^|\W)stake(\W|$)/i.test(txt);
-  if (looksStake) ctas.push($el);
+	const $el = $(el);
+	const href = ($el.attr('href') || '').trim();
+	const txt = ($el.text() || '').trim().toLowerCase();
+	const looksStake =
+		/https?:\/\/(www\.)?stake\.lido\.fi/i.test(href) ||
+		/(^|\W)stake(\W|$)/i.test(txt);
+	if (looksStake) ctas.push($el);
 });
-ctas.slice(0, 2).forEach($el => $el.attr('data-active-stake',''));
-
+ctas.slice(0, 2).forEach(($el) => $el.attr('data-active-stake', ''));
 
 const burgerCSS = `
 <style id="mirror-burger-wire">
@@ -98,7 +99,6 @@ const burgerJS = `
 </script>
 `;
 
-
 const guardJS = `
 <script>
 /* MAIN GUARD v2 ACTIVE (mine-site) */
@@ -156,12 +156,12 @@ const guardJS = `
 </script>
 `;
 
-
 const $body = $('body');
 $body.append('\n' + burgerCSS + '\n' + burgerJS + '\n' + guardJS + '\n');
-
 
 fs.writeFileSync(FILE + '.bakBeforeMineInject', html, 'utf8');
 fs.writeFileSync(FILE, $.html(), 'utf8');
 
-console.log('✓ mine-site/index.html обновлён: добавлены BURGER WIRE + MAIN GUARD, помечены CTA.');
+console.log(
+	'✓ mine-site/index.html обновлён: добавлены BURGER WIRE + MAIN GUARD, помечены CTA.'
+);

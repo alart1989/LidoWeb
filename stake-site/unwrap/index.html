@@ -1,5 +1,130 @@
-<!doctype html><meta charset="utf-8"><title>Redirecting…</title>
-<meta http-equiv="refresh" content="0; url=/wrap/wrap/">
-<link rel="canonical" href="/wrap/wrap/">
-<script>location.replace("/wrap/wrap/")</script>
-<p>Redirecting to <a href="/wrap/wrap/">/wrap/wrap/</a>…</p>
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>Redirecting…</title>
+<meta http-equiv="refresh" content="0; url=/wrap/unwrap/">
+<link rel="canonical" href="/wrap/unwrap/">
+<script>location.replace('/wrap/unwrap/');</script>
+</head><body><p>Redirecting to <a href="/wrap/unwrap/">/wrap/unwrap/</a>…</p>
+
+<script>
+/* STAKE THEME LOCK + LOGO FIX ACTIVE */
+(function(){
+  var MAIN_BASE='http://localhost:8000';
+
+  // 1) Принудительно светлая тема
+  try {
+    document.documentElement.setAttribute('data-lido-theme','light');
+    document.documentElement.classList.remove('dark');
+    document.querySelectorAll('[data-lido-theme]').forEach(x=>x.setAttribute('data-lido-theme','light'));
+    // подчистим localStorage/attrs с "theme"
+    try {
+      for (var i=0;i<localStorage.length;i++){
+        var k = localStorage.key(i);
+        if (/theme/i.test(k)) { localStorage.setItem(k,'light'); }
+      }
+    } catch(_) {}
+  } catch(_) {}
+
+  // 2) Выключаем переключатель темы (любые кнопки/иконки с "theme")
+  var THEME_SEL = '[aria-label*="theme" i], [data-testid*="theme" i], .theme-toggle, .ThemeToggle, button[class*="theme"], button[class*="Theme"]';
+  document.addEventListener('click', function(e){
+    var btn = e.target.closest && e.target.closest(THEME_SEL);
+    if (!btn) return;
+    e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+  }, true);
+
+  // 3) Лого → на главную (mine-site)
+  //   3.1 перепишем href в DOM
+  try {
+    document.querySelectorAll('a[href="/"], a[href^="https://lido.fi"], a[href^="http://lido.fi"]').forEach(function(a){
+      a.setAttribute('href', MAIN_BASE + '/');
+    });
+  } catch(_) {}
+  //   3.2 перехватим клики как страховку
+  document.addEventListener('click', function(e){
+    var a = e.target.closest && e.target.closest('a[href]');
+    if (!a) return;
+    var h = a.getAttribute('href') || '';
+    if (h === '/' || /^https?:\/\/(?:www\.)?lido\.fi\/?$/.test(h)) {
+      e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+      location.href = MAIN_BASE + '/';
+    }
+  }, true);
+
+  console.log('STAKE THEME LOCK + LOGO FIX ACTIVE');
+})();
+</script>
+
+<script>
+/* STAKE LOGO ONLY FIX ACTIVE */
+(function(){
+  var MAIN_BASE='http://localhost:8000';
+  var LOGO_SEL='a[aria-label="Main page"], a[aria-label*="main page" i], a[aria-label*="logo" i], .header-content_logoWrapper__SdLXi a, header .header-content_logoWrapper__SdLXi a, header a:has(svg.header-content_textLogo__4DBN3), header a:has(svg.header-content_textLogoML__sH1Rj)';
+  // оффлайн мы уже поправили href у лого; страхуемся рантаймом
+  document.addEventListener('click', function(e){
+    var a = e.target.closest && e.target.closest('a[href]');
+    if (!a) return;
+    if (a.matches(LOGO_SEL)) {
+      e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+      location.href = MAIN_BASE + '/';
+    }
+  }, true);
+  console.log('STAKE LOGO ONLY FIX ACTIVE');
+})();
+</script>
+
+<script>
+/* HOTFIX LOGO vs STAKE ACTIVE */
+(function(){
+  var MAIN_BASE='http://localhost:8000';
+  var LOGO_SEL='a:has([data-testid="lidoLogo"]), .styles__LogoLidoStyle-sc-1gnkrmu-0 a, a[aria-label="Main page"], a[aria-label*="logo" i]';
+
+  function isStakeMenuAnchor(a){
+    if (!a) return false;
+    try{
+      if (a.matches(LOGO_SEL)) return false;
+      var txt=(a.textContent||'').trim().toLowerCase();
+      if (txt!=='stake') return false;
+      return !!a.closest('header');
+    }catch(_){return false;}
+  }
+
+  // страхуем клики (capture): только лого → 8000, только пункт Stake (в хедере) → "/"
+  document.addEventListener('click', function(e){
+    var a = e.target.closest && e.target.closest('a');
+    if (!a) return;
+
+    // клик по ЛОГО
+    if (a.matches(LOGO_SEL) || (a.querySelector && a.querySelector('[data-testid="lidoLogo"]'))) {
+      e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+      location.href = MAIN_BASE + '/';
+      return;
+    }
+
+    // клик по пункту "Stake" в шапке
+    if (isStakeMenuAnchor(a)) {
+      e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+      location.href = '/';
+      return;
+    }
+  }, true);
+
+  // оффлайн-исправления в рантайме на всякий случай:
+  // 1) делаем у ЛОГО нормальный href и снимаем «заглушки»
+  document.querySelectorAll(LOGO_SEL).forEach(function(a){
+    a.setAttribute('href', MAIN_BASE + '/');
+    a.removeAttribute('aria-disabled');
+    a.removeAttribute('data-mirror-disabled');
+    a.removeAttribute('tabindex');
+  });
+  // 2) если у пункта "Stake" почему-то href на 8000 — вернём "/"
+  document.querySelectorAll('header a').forEach(function(a){
+    var txt=(a.textContent||'').trim().toLowerCase();
+    if (txt==='stake'){
+      var href=a.getAttribute('href')||'';
+      if (/^https?:\/\/localhost:8000\/?$/.test(href)) a.setAttribute('href','/');
+    }
+  });
+
+  console.log('HOTFIX LOGO vs STAKE ACTIVE');
+})();
+</script>
+</body></html>
