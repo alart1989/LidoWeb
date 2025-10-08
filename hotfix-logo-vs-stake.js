@@ -1,4 +1,4 @@
-// hotfix-logo-vs-stake.js — ЛОГО → http://localhost:8000/, пункт меню "Stake" → "/"
+
 const fs = require('fs');
 const path = require('path');
 const cheerio = require('cheerio');
@@ -7,7 +7,7 @@ const ROOT = path.resolve('./stake-site');
 const MAIN_BASE = 'http://localhost:8000';
 const MARK = 'HOTFIX LOGO vs STAKE ACTIVE';
 
-// селекторы ЛОГО под твой снимок:
+
 const LOGO_SEL = [
   'a:has([data-testid="lidoLogo"])',
   '.styles__LogoLidoStyle-sc-1gnkrmu-0 a',
@@ -41,19 +41,19 @@ const RUNTIME = `
     }catch(_){return false;}
   }
 
-  // страхуем клики (capture): только лого → 8000, только пункт Stake (в хедере) → "/"
+ 
   document.addEventListener('click', function(e){
     var a = e.target.closest && e.target.closest('a');
     if (!a) return;
 
-    // клик по ЛОГО
+   
     if (a.matches(LOGO_SEL) || (a.querySelector && a.querySelector('[data-testid="lidoLogo"]'))) {
       e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
       location.href = MAIN_BASE + '/';
       return;
     }
 
-    // клик по пункту "Stake" в шапке
+   
     if (isStakeMenuAnchor(a)) {
       e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
       location.href = '/';
@@ -61,15 +61,15 @@ const RUNTIME = `
     }
   }, true);
 
-  // оффлайн-исправления в рантайме на всякий случай:
-  // 1) делаем у ЛОГО нормальный href и снимаем «заглушки»
+ 
+ 
   document.querySelectorAll(LOGO_SEL).forEach(function(a){
     a.setAttribute('href', MAIN_BASE + '/');
     a.removeAttribute('aria-disabled');
     a.removeAttribute('data-mirror-disabled');
     a.removeAttribute('tabindex');
   });
-  // 2) если у пункта "Stake" почему-то href на 8000 — вернём "/"
+
   document.querySelectorAll('header a').forEach(function(a){
     var txt=(a.textContent||'').trim().toLowerCase();
     if (txt==='stake'){
@@ -90,7 +90,7 @@ for (const file of files) {
   const src = fs.readFileSync(file, 'utf8');
   const $ = cheerio.load(src, { decodeEntities:false });
 
-  // ОФФЛАЙН: починим лого и пункт "Stake"
+  
   $(LOGO_SEL).each((_, el) => {
     const $a = $(el);
     $a.attr('href', MAIN_BASE + '/');

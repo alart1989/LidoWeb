@@ -1,4 +1,4 @@
-// fix-base.js — ставит <base href="/"> во всех stake-site/**/index.html
+
 const fs = require('fs');
 const path = require('path');
 const cheerio = require('cheerio');
@@ -23,7 +23,7 @@ for (const file of files) {
 
   const $base = $('base[href]');
   if ($base.length) {
-    $base.attr('href', '/');                 // ключевая правка
+    $base.attr('href', '/');                
     fs.writeFileSync(file + '.bakBeforeBase', html, 'utf8');
     fs.writeFileSync(file, $.html(), 'utf8');
     console.log('✓ base → / :', path.relative(process.cwd(), file));

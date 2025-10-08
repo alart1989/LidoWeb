@@ -1,5 +1,4 @@
-// stake-logo-only-fix.js — только логотип → на главную; "Stake" (меню) → на корень stake.
-// Ничего больше не трогаем.
+
 const fs = require('fs');
 const path = require('path');
 const cheerio = require('cheerio');
@@ -8,7 +7,7 @@ const ROOT = path.resolve('./stake-site');
 const MAIN_BASE = 'http://localhost:8000';
 const MARK = 'STAKE LOGO ONLY FIX ACTIVE';
 
-// ЛОГО: селекторы ровно под твой снимок и типичные варианты
+
 const LOGO_SEL = [
   'a:has([data-testid="lidoLogo"])',
   '.styles__LogoLidoStyle-sc-1gnkrmu-0 a',
@@ -16,13 +15,13 @@ const LOGO_SEL = [
   'a[aria-label*="logo" i]'
 ].join(', ');
 
-// Пункт меню "Stake" в шапке (исключаем логотип)
+
 function isStakeMenuAnchor($, a) {
   const $a = $(a);
   if ($a.is(LOGO_SEL)) return false;
   const txt = ($a.text() || '').trim().toLowerCase();
   if (txt !== 'stake') return false;
-  // желателен хедер в предках
+  
   const inHeader = $a.closest('header').length > 0;
   return inHeader;
 }
@@ -43,14 +42,14 @@ for (const file of files) {
   const src = fs.readFileSync(file, 'utf8');
   const $ = cheerio.load(src, { decodeEntities:false });
 
-  // 1) ЛОГО: делаем ссылкой на главную, снимаем "задизейблено"
+ 
   $(LOGO_SEL).each((_, el) => {
     const $a = $(el);
     $a.attr('href', MAIN_BASE + '/');
     $a.removeAttr('data-mirror-disabled').removeAttr('aria-disabled').removeAttr('tabindex');
   });
 
-  // 2) "Stake" (в меню): вернуть на корень stake ("/"), если вдруг указывает на главную
+ 
   $('a[href]').each((_, el) => {
     const $a = $(el);
     const href = $a.attr('href') || '';
@@ -60,7 +59,7 @@ for (const file of files) {
     }
   });
 
-  // 3) Рантайм-страховка: клики по ЛОГО → на главную; клики по "Stake" (меню) → на "/"
+ 
   if (!src.includes(MARK)) {
     const RUNTIME = `
 <script>

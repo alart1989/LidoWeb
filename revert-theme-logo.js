@@ -1,4 +1,4 @@
-// revert-theme-logo.js — откат к состоянию ДО theme+logo-патча
+
 const fs = require('fs');
 const path = require('path');
 
