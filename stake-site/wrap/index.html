@@ -103,7 +103,7 @@
 <script>
 /* STAKE THEME LOCK + LOGO FIX ACTIVE */
 (function(){
-  var MAIN_BASE='http://localhost:8000';
+  var MAIN_BASE='https://lido-web-main.vercel.app/';
 
   // 1) Принудительно светлая тема
   try {
@@ -152,7 +152,7 @@
 <script>
 /* STAKE LOGO ONLY FIX ACTIVE */
 (function(){
-  var MAIN_BASE='http://localhost:8000';
+  var MAIN_BASE='https://lido-web-main.vercel.app/';
   var LOGO_SEL='a[aria-label="Main page"], a[aria-label*="main page" i], a[aria-label*="logo" i], .header-content_logoWrapper__SdLXi a, header .header-content_logoWrapper__SdLXi a, header a:has(svg.header-content_textLogo__4DBN3), header a:has(svg.header-content_textLogoML__sH1Rj)';
   // оффлайн мы уже поправили href у лого; страхуемся рантаймом
   document.addEventListener('click', function(e){
@@ -170,7 +170,7 @@
 <script>
 /* HOTFIX LOGO vs STAKE ACTIVE */
 (function(){
-  var MAIN_BASE='http://localhost:8000';
+  var MAIN_BASE='https://lido-web-main.vercel.app/';
   var LOGO_SEL='a:has([data-testid="lidoLogo"]), .styles__LogoLidoStyle-sc-1gnkrmu-0 a, a[aria-label="Main page"], a[aria-label*="logo" i]';
 
   function isStakeMenuAnchor(a){
