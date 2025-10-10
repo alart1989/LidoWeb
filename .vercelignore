@@ -1,0 +1,5 @@
+*.bak*
+*Before*
+.DS_Store
+node_modules
+dump

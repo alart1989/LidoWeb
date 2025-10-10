@@ -5,3 +5,8 @@ dump/
 *.bak*
 *Before*
 
+
+*.bak*
+*Before*
+.DS_Store
+dump/
