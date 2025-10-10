@@ -1,4 +1,4 @@
-// vercel-link-guard.js — чинит кросс-линки main ⇄ stake на проде
+
 const fs = require('fs'), path = require('path'), cheerio = require('cheerio');
 const MAIN = 'https://lido-web-mine-site.vercel.app';
 const STAKE = 'https://lido-web-stake-site.vercel.app';
