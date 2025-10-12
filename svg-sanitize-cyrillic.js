@@ -1,4 +1,4 @@
-// svg-sanitize-cyrillic.js — меняем кириллические буквы-команды на латиницу внутри d=""
+
 const fs = require('fs');
 const path = require('path');
 
@@ -13,8 +13,8 @@ const map = new Map(Object.entries({
   'с':'c','С':'C',
   'а':'a','А':'A',
   'т':'t','Т':'T',
-  'р':'p','Р':'P', // на всякий случай, в командах не нужно
-  'о':'o','О':'O'  // тоже на всякий случай
+  'р':'p','Р':'P', 
+  'о':'o','О':'O' 
 }));
 
 function fixD(d){
@@ -24,7 +24,7 @@ function fixD(d){
 function processFile(file){
   const src = fs.readFileSync(file, 'utf8');
   let out = src;
-  // точечно: d="..."; d='...'
+ 
   out = out.replace(/d="([^"]*)"/g, (_, val) => `d="${fixD(val)}"`);
   out = out.replace(/d='([^']*)'/g, (_, val) => `d='${fixD(val)}'`);
   if (out !== src) {
