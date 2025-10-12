@@ -10,3 +10,8 @@ dump/
 *Before*
 .DS_Store
 dump/
+
+# backups
+*.bak
+*.bakBefore*
+.DS_Store

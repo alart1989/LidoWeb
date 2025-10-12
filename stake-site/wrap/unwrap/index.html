@@ -253,4 +253,545 @@
     if (next){ e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation(); location.href = next; }
   }, true);
 })();
-</script></body></html>
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+/* MIRROR TOKEN CLEAN v1 */
+(function(){
+  var OPTIONS = [
+    {label:'Lido (stETH)',  short:'stETH'},
+    {label:'Lido (wstETH)', short:'wstETH'}
+  ];
+
+  var CTRL_SEL = [
+    'label.sc-bbSZdi.styles__SelectIconStyle-sc-1c25chm-0',
+    'label:has(input[data-testid="drop-down"][readonly])',
+    '[data-testid="drop-down"]'
+  ].join(',');
+
+  function persistSet(v){ try{ localStorage.setItem('mirror.selectedToken', v); }catch(_){} }
+  function persistGet(){ try{ return localStorage.getItem('mirror.selectedToken'); }catch(_){ return null; } }
+
+  function ensureRel(el){
+    if (!el) return;
+    var cs = getComputedStyle(el);
+    if (cs.position === 'static') el.style.position = 'relative';
+  }
+
+  function buildMenu(host, apply){
+    var menu = host.querySelector('.mirror-minimal-token-menu');
+    if (menu) return menu;
+    menu = document.createElement('div');
+    menu.className = 'mirror-minimal-token-menu';
+    menu.setAttribute('role','menu');
+    OPTIONS.forEach(function(opt){
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'mirror-minimal-token-item';
+      b.textContent = opt.label;
+      b.setAttribute('data-token', opt.short);
+      b.addEventListener('click', function(e){
+        e.preventDefault(); e.stopPropagation();
+        apply(opt);
+        closeAllMenus();
+      });
+      menu.appendChild(b);
+    });
+    host.appendChild(menu);
+    return menu;
+  }
+
+  function toggleMenu(host, apply){
+    var m = buildMenu(host, apply);
+    if (!m) return;
+    var open = m.style.display === 'block';
+    closeAllMenus();
+    m.style.display = open ? 'none' : 'block';
+  }
+
+  function closeAllMenus(){
+    document.querySelectorAll('.mirror-minimal-token-menu').forEach(function(m){ m.style.display='none'; });
+  }
+
+  function applySelection(host, opt){
+    var input = host.querySelector('input[data-testid="drop-down"][readonly], input[name="token"][readonly]') || host.querySelector('input[readonly]');
+    if (input){ try{ input.value = opt.label; input.setAttribute('value', opt.label); }catch(_){ } }
+
+    document.querySelectorAll('[data-currency-label]').forEach(function(x){ x.textContent = opt.short; });
+
+    var scope = host.closest('.sc-gFAWRd') || document;
+    Array.from(scope.querySelectorAll('.sc-esYiGF, .styles__InputStyle-sc-zr8x53-0 span, label span')).forEach(function(el){
+      var t = (el.textContent||'').trim();
+      if (/^(stETH|wstETH) amount$/i.test(t)) el.textContent = opt.short + ' amount';
+    });
+
+    document.documentElement.setAttribute('data-selected-token', opt.short);
+    persistSet(opt.short);
+  }
+
+  var css = document.createElement('style');
+  css.textContent = `
+    .mirror-minimal-token-menu{
+      position:absolute; z-index:999999;
+      top:calc(100% + 8px); left:0; min-width:240px;
+      background:#fff; color:#111; border:1px solid rgba(0,0,0,.12);
+      border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,.16);
+      padding:6px; display:none;
+    }
+    .mirror-minimal-token-item{
+      display:block; width:100%; text-align:left;
+      padding:10px 12px; border:none; background:transparent;
+      border-radius:8px; cursor:pointer; font:inherit; line-height:1.2;
+    }
+    .mirror-minimal-token-item:hover{ background:rgba(0,0,0,.05); }
+  `;
+  document.head.appendChild(css);
+
+  function initOne(host){
+    if (!host || host.__mirrorTokenClean) return;
+    host.__mirrorTokenClean = true;
+    ensureRel(host);
+
+    var saved = persistGet();
+    if (saved){
+      var opt = OPTIONS.find(o=>o.short===saved);
+      if (opt) applySelection(host, opt);
+    }
+
+    host.addEventListener('click', function(e){
+      if (e.target.closest('.mirror-minimal-token-menu')) return;
+      e.preventDefault(); e.stopPropagation();
+      toggleMenu(host, function(opt){ applySelection(host, opt); });
+    });
+  }
+
+  document.querySelectorAll(CTRL_SEL).forEach(initOne);
+
+  new MutationObserver(function(ms){
+    ms.forEach(function(m){
+      if (m.type==='childList'){
+        m.addedNodes.forEach(function(n){
+          if (n.nodeType!==1) return;
+          if (n.matches && n.matches(CTRL_SEL)) initOne(n);
+          if (n.querySelectorAll) n.querySelectorAll(CTRL_SEL).forEach(initOne);
+        });
+      }
+    });
+  }).observe(document.documentElement, {subtree:true, childList:true});
+
+  document.addEventListener('click', function(e){
+    if (!e.target.closest('.mirror-minimal-token-menu')) closeAllMenus();
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key==='Escape') closeAllMenus();
+  });
+})();
+</script>
+
+<script>
+/* MIRROR TOKEN ICONS v1 */
+(function(){
+  // SVG иконки (минимальные)
+  var ICONS = {
+    LIDO: '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M7.078 11.148l-.135.206a5.788 5.788 0 00.814 7.32 6.043 6.043 0 004.24 1.72l-4.92-9.246z" fill="#00A3FF"></path><path opacity="0.6" d="M11.997 13.958l-4.92-2.81 4.92 9.246v-6.436zm4.925-2.81l.134.206a5.788 5.788 0 01-.813 7.32 6.043 6.043 0 01-4.24 1.72l4.92-9.246z" fill="#00A3FF"></path><path opacity="0.2" d="M12.002 13.958l4.92-2.81-4.92 9.246v-6.436zm.001-6.278v4.847l4.238-2.422-4.238-2.425z" fill="#00A3FF"></path><path opacity="0.6" d="M12.003 7.68l-4.24 2.425 4.24 2.422V7.68z" fill="#00A3FF"></path><path d="M12.003 3.604l-4.24 6.502 4.24-2.431V3.604z" fill="#00A3FF"></path><path opacity="0.6" d="M12.003 7.674l4.241 2.432-4.24-6.506v4.074z" fill="#00A3FF"></path></svg>',
+    ETH:  '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path opacity="0.6" d="M11.999 3.75v6.098l5.248 2.303-5.248-8.401z"></path><path d="M11.999 3.75L6.75 12.151l5.249-2.303V3.75z"></path><path opacity="0.6" d="M11.999 16.103v4.143l5.251-7.135L12 16.103z"></path><path d="M11.999 20.246v-4.144L6.75 13.111l5.249 7.135z"></path><path opacity="0.2" d="M11.999 15.144l5.248-2.993-5.248-2.301v5.294z"></path><path opacity="0.6" d="M6.75 12.151l5.249 2.993V9.85l-5.249 2.3z"></path></svg>'
+  };
+
+  // Нормализуем подпись
+  function normalizeLabel(raw){
+    var s = String(raw || '').trim();
+    if (/wsts*eth/i.test(s)) return 'Lido (wstETH)';
+    if (/sts*eth/i.test(s))  return 'Lido (stETH)';
+    if (/ethereum|\beth\b/i.test(s)) return 'Ethereum (ETH)';
+    // по умолчанию оставим как есть
+    return s || 'Lido (stETH)';
+  }
+
+  // Определим токен по нормализованной подписи
+  function tokenFromLabel(lbl){
+    if (/wstETH/i.test(lbl)) return 'wstETH';
+    if (/stETH/i.test(lbl))  return 'stETH';
+    if (/Ethereum \(ETH\)/i.test(lbl)) return 'ETH';
+    return 'stETH';
+  }
+
+  // Найти контейнер иконки рядом с инпутом
+  function findIconHost(ctrl){
+    // в твоём HTML это <span class="sc-eyvILC ..."> внутри двух <span> обёрток
+    return ctrl && ctrl.querySelector('.sc-eyvILC') || null;
+  }
+
+  // Поставить нужную иконку
+  function setIcon(ctrl, token){
+    var host = findIconHost(ctrl);
+    if (!host) return;
+    var svg = (token === 'ETH') ? ICONS.ETH : ICONS.LIDO;
+    // Меняем аккуратно
+    host.innerHTML = svg;
+  }
+
+  // Обновить один контрол: подпись, иконка, короткие лейблы
+  function refreshControl(ctrl){
+    var input = ctrl.querySelector('input[data-testid="drop-down"][readonly], input[name="token"][readonly]') || ctrl.querySelector('input[readonly]');
+    var current = normalizeLabel(input ? (input.value || input.getAttribute('value')) : '');
+    var savedShort = (function(){ try{ return localStorage.getItem('mirror.selectedToken'); }catch(_){ return null; } })();
+
+    // Если есть сохранённый выбор — применим его
+    if (savedShort) {
+      if (savedShort === 'wstETH') current = 'Lido (wstETH)';
+      else if (savedShort === 'stETH') current = 'Lido (stETH)';
+      else if (savedShort === 'ETH') current = 'Ethereum (ETH)';
+    }
+
+    // Проставим в input
+    if (input){
+      try{
+        input.value = current;
+        input.setAttribute('value', current);
+      }catch(_){}
+    }
+
+    // Иконка
+    var token = tokenFromLabel(current);
+    setIcon(ctrl, token);
+
+    // Обновим короткие подписи по странице
+    var short = (token === 'ETH') ? 'ETH' : token; // stETH / wstETH / ETH
+    document.querySelectorAll('[data-currency-label]').forEach(function(x){ x.textContent = short; });
+
+    // Подпись «… amount» рядом
+    var scope = ctrl.closest('.sc-gFAWRd') || document;
+    Array.from(scope.querySelectorAll('.sc-esYiGF, .styles__InputStyle-sc-zr8x53-0 span, label span'))
+      .forEach(function(el){
+        var t = (el.textContent||'').trim();
+        if (/^(stETH|wstETH|ETH) amount$/i.test(t)) el.textContent = short + ' amount';
+      });
+  }
+
+  // Инициализация: пройдем по всем контролам выбора
+  function initAll(){
+    document.querySelectorAll(
+      'label.sc-bbSZdi.styles__SelectIconStyle-sc-1c25chm-0, label:has(input[data-testid="drop-down"][readonly]), [data-testid="drop-down"]'
+    ).forEach(refreshControl);
+  }
+
+  // Обновлять после любого клика (когда ты выбираешь пункт меню нашего дропдауна)
+  document.addEventListener('click', function(){
+    // небольшая задержка, чтобы предыдущие обработчики успели отработать
+    setTimeout(initAll, 0);
+  });
+
+  // И при загрузке
+  initAll();
+})();
+</script>
+
+<script>
+/* MIRROR TOKEN ICONS v2 */
+(function(){
+  // SVG
+  var ICON_LIDO = '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M7.078 11.148l-.135.206a5.788 5.788 0 00.814 7.32 6.043 6.043 0 004.24 1.72l-4.92-9.246z" fill="#00A3FF"></path><path opacity="0.6" d="M11.997 13.958l-4.92-2.81 4.92 9.246v-6.436zm4.925-2.81l.134.206a5.788 5.788 0 01-.813 7.32 6.043 6.043 0 01-4.24 1.72l4.92-9.246z" fill="#00A3FF"></path><path opacity="0.2" d="M12.002 13.958l4.92-2.81-4.92 9.246v-6.436zm.001-6.278v4.847l4.238-2.422-4.238-2.425z" fill="#00A3FF"></path><path opacity="0.6" d="M12.003 7.68l-4.24 2.425 4.24 2.422V7.68z" fill="#00A3FF"></path><path d="M12.003 3.604l-4.24 6.502 4.24-2.431V3.604z" fill="#00A3FF"></path><path opacity="0.6" d="M12.003 7.674l4.241 2.432-4.24-6.506в4.074z" fill="#00A3FF"></path></svg>';
+  var ICON_ETH  = '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path opacity="0.6" d="M11.999 3.75v6.098l5.248 2.303-5.248-8.401z"></path><path d="M11.999 3.75L6.75 12.151l5.249-2.303V3.75z"></path><path opacity="0.6" d="M11.999 16.103v4.143l5.251-7.135L12 16.103z"></path><path d="M11.999 20.246v-4.144L6.75 13.111l5.249 7.135z"></path><path opacity="0.2" d="M11.999 15.144l5.248-2.993-5.248-2.301v5.294z"></path><path opacity="0.6" d="M6.75 12.151l5.249 2.993V9.85l-5.249 2.3z"></path></svg>';
+
+  function getSaved(){
+    try{ return localStorage.getItem('mirror.selectedToken'); }catch(_){ return null; }
+  }
+  function shortFromLabel(lbl){
+    if (/wstETH/i.test(lbl)) return 'wstETH';
+    if (/stETH/i.test(lbl))  return 'stETH';
+    if (/Ethereum \(ETH\)/i.test(lbl)) return 'ETH';
+    return null;
+  }
+  function normalizedLabel(short){
+    if (short === 'wstETH') return 'Lido (wstETH)';
+    if (short === 'stETH')  return 'Lido (stETH)';
+    if (short === 'ETH')    return 'Ethereum (ETH)';
+    return 'Lido (stETH)';
+  }
+
+  function findControls(){
+    return document.querySelectorAll(
+      'label.sc-bbSZdi.styles__SelectIconStyle-sc-1c25chm-0, '+
+      'label:has(input[data-testid="drop-down"][readonly]), '+
+      '[data-testid="drop-down"]'
+    );
+  }
+  function findInput(ctrl){
+    return ctrl.querySelector('input[data-testid="drop-down"][readonly], input[name="token"][readonly]') || ctrl.querySelector('input[readonly]');
+  }
+  function findIconHost(ctrl){
+    return ctrl.querySelector('.sc-eyvILC') || ctrl.querySelector('svg')?.parentElement || null;
+  }
+
+  function applyToControl(ctrl, short){
+    var label = normalizedLabel(short);
+    var inp = findInput(ctrl);
+    if (inp){ try{ inp.value = label; inp.setAttribute('value', label); }catch(_){ } }
+    // иконка
+    var host = findIconHost(ctrl);
+    if (host){ host.innerHTML = (short === 'ETH') ? ICON_ETH : ICON_LIDO; }
+    // короткие подписи
+    document.querySelectorAll('[data-currency-label]').forEach(function(x){ x.textContent = short; });
+    // “... amount” рядом
+    var scope = ctrl.closest('.sc-gFAWRd') || document;
+    Array.from(scope.querySelectorAll('.sc-esYiGF, .styles__InputStyle-sc-zr8x53-0 span, label span')).forEach(function(el){
+      var t=(el.textContent||'').trim();
+      if (/^(stETH|wstETH|ETH) amount$/i.test(t)) el.textContent = short+' amount';
+    });
+    // для css если нужно
+    document.documentElement.setAttribute('data-selected-token', short);
+  }
+
+  function refreshAll(){
+    var saved = getSaved(); // предпочтительно берём сохранённый выбор
+    findControls().forEach(function(ctrl){
+      var inp = findInput(ctrl);
+      var currentShort = saved || shortFromLabel(inp ? (inp.value || inp.getAttribute('value') || '') : '');
+      applyToControl(ctrl, currentShort || 'stETH');
+    });
+  }
+
+  // при загрузке
+  refreshAll();
+  // после любого клика (в т.ч. выбора в нашем меню)
+  document.addEventListener('click', function(){ setTimeout(refreshAll, 0); });
+  // и на динамические изменения
+  new MutationObserver(function(){ setTimeout(refreshAll, 0); })
+    .observe(document.documentElement, {subtree:true, childList:true});
+})();
+</script>
+
+<script>
+/* MIRROR TOKEN ICONS v3 */
+(function(){
+  var ICON_LIDO = '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M7.078 11.148l-.135.206a5.788 5.788 0 00.814 7.32 6.043 6.043 0 004.24 1.72l-4.92-9.246z" fill="#00A3FF"></path><path opacity="0.6" d="M11.997 13.958l-4.92-2.81 4.92 9.246v-6.436zm4.925-2.81l.134.206a5.788 5.788 0 01-.813 7.32 6.043 6.043 0 01-4.24 1.72l-4.92-9.246z" fill="#00A3FF"></path><path opacity="0.2" d="M12.002 13.958l4.92-2.81-4.92 9.246v-6.436zm.001-6.278v4.847l4.238-2.422-4.238-2.425z" fill="#00A3FF"></path><path opacity="0.6" d="M12.003 7.68l-4.24 2.425 4.24 2.422V7.68z" fill="#00A3FF"></path><path d="M12.003 3.604l-4.24 6.502 4.24-2.431V3.604z" fill="#00A3FF"></path><path opacity="0.6" d="M12.003 7.674l4.241 2.432-4.24-6.506v4.074z" fill="#00A3FF"></path></svg>';
+  var ICON_ETH  = '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path opacity="0.6" d="M11.999 3.75v6.098l5.248 2.303-5.248-8.401z"></path><path d="M11.999 3.75L6.75 12.151l5.249-2.303V3.75z"></path><path opacity="0.6" d="M11.999 16.103v4.143l5.251-7.135L12 16.103z"></path><path d="M11.999 20.246в-4.144L6.75 13.111l5.249 7.135z"></path><path opacity="0.2" d="M11.999 15.144l5.248-2.993-5.248-2.301v5.294z"></path><path opacity="0.6" d="M6.75 12.151l5.249 2.993V9.85l-5.249 2.3z"></path></svg>';
+
+  function normLabel(raw){
+    var s = String(raw||'').trim();
+    if (/wst\s*eth/i.test(s)) return 'Lido (wstETH)';
+    if (/^lido\s*\(steth\)$/i.test(s) || /st\s*eth/i.test(s)) return 'Lido (stETH)';
+    if (/ethereum|\bETH\b/i.test(s)) return 'Ethereum (ETH)';
+    return 'Lido (stETH)';
+  }
+  function shortFrom(lbl){
+    if (/wstETH/i.test(lbl)) return 'wstETH';
+    if (/stETH/i.test(lbl))  return 'stETH';
+    if (/Ethereum \(ETH\)/i.test(lbl)) return 'ETH';
+    return 'stETH';
+  }
+
+  function syncOne(inp){
+    if (!inp) return;
+    var root = inp.closest('.sc-fBWQRz') || inp.parentElement;
+    if (!root) return;
+
+    // 1) нормализуем подпись
+    var lbl = normLabel(inp.value || inp.getAttribute('value') || '');
+    try { inp.value = lbl; inp.setAttribute('value', lbl); } catch(_) {}
+
+    // 2) иконка
+    var iconHost = root.querySelector('.sc-eyvILC') || null;
+    var tok = shortFrom(lbl);
+    if (iconHost) iconHost.innerHTML = (tok === 'ETH') ? ICON_ETH : ICON_LIDO;
+
+    // 3) короткие подписи и “... amount”
+    document.querySelectorAll('[data-currency-label]').forEach(function(x){ x.textContent = tok; });
+
+    var scope = root.closest('.sc-gFAWRd') || document;
+    Array.from(scope.querySelectorAll('.sc-esYiGF, .styles__InputStyle-sc-zr8x53-0 span, label span')).forEach(function(el){
+      var t=(el.textContent||'').trim();
+      if (/^(stETH|wstETH|ETH) amount$/i.test(t)) el.textContent = tok + ' amount';
+    });
+
+    document.documentElement.setAttribute('data-selected-token', tok);
+  }
+
+  function runAll(){
+    document.querySelectorAll('input[data-testid="drop-down"][readonly], input[name="token"][readonly]').forEach(syncOne);
+  }
+
+  // при загрузке
+  runAll();
+
+  // после кликов (наш дропдаун меняет value → пересинхронизируем)
+  document.addEventListener('click', function(){ setTimeout(runAll, 0); });
+
+  // на динамику: если DOM обновился — пересинхронизируем
+  new MutationObserver(function(){ setTimeout(runAll, 0); })
+    .observe(document.documentElement, {subtree:true, childList:true, attributes:true, attributeFilter:['value']});
+})();
+</script>
+
+
+
+<script>
+/* MIRROR TOKEN DROPDOWN ICONS v4.1 */
+(function(){
+  console.log('MIRROR TOKEN DROPDOWN ICONS v4.1 ACTIVE');
+
+  var ICON_LIDO = '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M7.078 11.148l-.135.206a5.788 5.788 0 00.814 7.32 6.043 6.043 0 004.24 1.72l-4.92-9.246z" fill="#00A3FF"></path><path opacity="0.6" d="M11.997 13.958l-4.92-2.81 4.92 9.246v-6.436zm4.925-2.81l.134.206a5.788 5.788 0 01-.813 7.32 6.043 6.043 0 01-4.24 1.72l-4.92-9.246z" fill="#00A3FF"></path><path opacity="0.2" d="M12.002 13.958l4.92-2.81-4.92 9.246v-6.436zm.001-6.278v4.847l4.238-2.422-4.238-2.425z" fill="#00A3FF"></path><path opacity="0.6" d="M12.003 7.68l-4.24 2.425 4.24 2.422V7.68z" fill="#00A3FF"></path><path d="M12.003 3.604l-4.24 6.502 4.24-2.431V3.604z" fill="#00A3FF"></path><path opacity="0.6" d="M12.003 7.674l4.241 2.432-4.24-6.506v4.074z" fill="#00A3FF"></path></svg>';
+  var ICON_ETH  = '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path opacity="0.6" d="M11.999 3.75v6.098l5.248 2.303-5.248-8.401z"></path><path d="M11.999 3.75L6.75 12.151l5.249-2.303V3.75z"></path><path opacity="0.6" d="M11.999 16.103v4.143l5.251-7.135L12 16.103z"></path><path d="M11.999 20.246v-4.144L6.75 13.111l5.249 7.135z"></path><path opacity="0.2" d="M11.999 15.144l5.248-2.993-5.248-2.301v5.294з"></path><path opacity="0.6" d="M6.75 12.151l5.249 2.993V9.85л-5.249 2.3з"></path></svg>';
+
+  var OPTIONS = [
+    { short: 'stETH',  label: 'Lido (stETH)',  icon: ICON_LIDO },
+    { short: 'ETH',    label: 'Ethereum (ETH)', icon: ICON_ETH  }
+  ];
+
+  // CSS: без анимаций/переходов у SVG
+  (function(){
+    var css = document.createElement('style');
+    css.textContent = `
+      .mirror-token-menu-icons{
+        position:absolute; z-index:999999;
+        top:calc(100% + 8px); left:0; min-width:260px;
+        background:#fff; color:#111; border:1px solid rgba(0,0,0,.12);
+        border-radius:14px; box-shadow:0 10px 30px rgba(0,0,0,.16);
+        padding:8px; display:none;
+      }
+      .mirror-token-item-icons{
+        display:flex; align-items:center; gap:12px;
+        width:100%; text-align:left; padding:10px 12px;
+        border:none; background:transparent; border-radius:10px;
+        cursor:pointer; font:inherit;
+      }
+      .mirror-token-item-icons:hover{ background:rgba(0,0,0,.05); }
+      .mirror-token-item-icons .ico{ width:24px; height:24px; display:inline-flex; align-items:center; }
+      .mirror-token-item-icons .lbl{ white-space:nowrap; }
+      .sc-eyvILC svg{ transition:none !important; animation:none !important; }
+    `;
+    document.head.appendChild(css);
+  })();
+
+  function findControls(){
+    var inputs = document.querySelectorAll('input[data-testid="drop-down"][readonly], input[name="token"][readonly]');
+    return Array.from(inputs).map(function(inp){
+      var root = inp.closest('.sc-fBWQRz') || inp.parentElement;
+      var iconHost = root ? (root.querySelector('.sc-eyvILC') || null) : null;
+      var selectRoot = root ? (root.closest('label') || root) : null;
+      return { inp, root, iconHost, selectRoot };
+    }).filter(Boolean);
+  }
+
+  function normalizedFromShort(short){
+    var opt = OPTIONS.find(o=>o.short===short);
+    return opt ? opt.label : OPTIONS[0].label;
+  }
+  function shortFromLabel(lbl){
+    var s = String(lbl||'').trim();
+    if (/Ethereum \(ETH\)/i.test(s) || /\bETH\b/i.test(s)) return 'ETH';
+    return 'stETH';
+  }
+  function persistSet(v){ try{ localStorage.setItem('mirror.selectedToken', v);}catch(_){ } }
+  function persistGet(){ try{ return localStorage.getItem('mirror.selectedToken'); }catch(_){ return null; } }
+
+  function setIcon(host, short){
+    if (!host) return;
+    // если уже стоит эта иконка — не трогаем DOM (избегаем мерцаний)
+    if (host.dataset && host.dataset.token === short) return;
+    host.dataset.token = short;
+    host.innerHTML = (short === 'ETH') ? ICON_ETH : ICON_LIDO;
+  }
+
+  function applySelection(ctrl, short){
+    var label = normalizedFromShort(short);
+    try { ctrl.inp.value = label; ctrl.inp.setAttribute('value', label); } catch(_){}
+    setIcon(ctrl.iconHost, short);
+    document.querySelectorAll('[data-currency-label]').forEach(function(x){ x.textContent = short; });
+    var scope = ctrl.root || document;
+    Array.from(scope.querySelectorAll('.sc-esYiGF, .styles__InputStyle-sc-zr8x53-0 span, label span')).forEach(function(el){
+      var t=(el.textContent||'').trim();
+      if (/^(stETH|wstETH|ETH) amount$/i.test(t)) el.textContent = short + ' amount';
+    });
+    document.documentElement.setAttribute('data-selected-token', short);
+    persistSet(short);
+  }
+
+  function ensureMenu(ctrl){
+    var host = ctrl.selectRoot;
+    var menu = host.querySelector('.mirror-token-menu-icons');
+    if (menu) return menu;
+    var cs = getComputedStyle(host);
+    if (cs.position === 'static') host.style.position = 'relative';
+
+    menu = document.createElement('div');
+    menu.className = 'mirror-token-menu-icons'; menu.setAttribute('role','menu');
+    OPTIONS.forEach(function(opt){
+      var item = document.createElement('button');
+      item.type='button';
+      item.className='mirror-token-item-icons';
+      item.innerHTML = '<span class="ico">'+opt.icon+'</span><span class="lbl">'+opt.label+'</span>';
+      item.addEventListener('click', function(e){
+        e.preventDefault(); e.stopPropagation();
+        applySelection(ctrl, opt.short);
+        closeAllMenus();
+      });
+      menu.appendChild(item);
+    });
+    host.appendChild(menu);
+    return menu;
+  }
+
+  function toggleMenu(ctrl){
+    var m = ensureMenu(ctrl);
+    var open = m.style.display === 'block';
+    closeAllMenus();
+    m.style.display = open ? 'none' : 'block';
+  }
+  function closeAllMenus(){
+    document.querySelectorAll('.mirror-token-menu-icons').forEach(m=>m.style.display='none');
+  }
+
+  // --- init с дебаунсом ---
+  var initedFor = new WeakSet();
+  function initOnce(ctrl){
+    if (!ctrl || initedFor.has(ctrl)) return;
+    initedFor.add(ctrl);
+
+    // начальный выбор
+    var saved = persistGet();
+    var short = saved || shortFromLabel(ctrl.inp.value || ctrl.inp.getAttribute('value'));
+    applySelection(ctrl, short);
+
+    ctrl.selectRoot.addEventListener('click', function(e){
+      if (e.target.closest('.mirror-token-menu-icons')) return;
+      e.preventDefault(); e.stopPropagation();
+      toggleMenu(ctrl);
+    }, {capture:true});
+  }
+
+  function initAll(){
+    findControls().forEach(initOnce);
+  }
+
+  // первая инициализация
+  initAll();
+
+  // закрытие по клику вне / ESC
+  document.addEventListener('click', function(e){
+    if (!e.target.closest('.mirror-token-menu-icons')) closeAllMenus();
+  }, true);
+  document.addEventListener('keydown', function(e){ if (e.key==='Escape') closeAllMenus(); });
+
+  // спокойный наблюдатель: дебаунс через rAF
+  var scheduled = false;
+  var mo = new MutationObserver(function(){
+    if (scheduled) return;
+    scheduled = true;
+    requestAnimationFrame(function(){ scheduled = false; initAll(); });
+  });
+  mo.observe(document.documentElement, {subtree:true, childList:true});
+})();
+</script>
+</body></html>

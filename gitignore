@@ -10,3 +10,8 @@ dump/
 *.bak*
 *BeforeBase
 *BeforeHardGuard
+
+# backups
+*.bak
+*.bakBefore*
+.DS_Store
