@@ -1,4 +1,4 @@
-// repair-rewards-inline.js — чинит rewards/index.html: убирает битые инъекции и вставляет чистые лёгкие версии
+
 const fs = require('fs');
 const path = require('path');
 
@@ -11,23 +11,23 @@ if (!fs.existsSync(FILE)) {
 let html = fs.readFileSync(FILE, 'utf8');
 const original = html;
 
-// 0) Санитизируем невидимые символы, умные кавычки и BOM
+
 html = html.replace(/^\uFEFF/, '');
 html = html.replace(/\u00A0/g, ' ');
 html = html.replace(/[\u2018\u2019]/g, "'").replace(/[\u201C\u201D]/g, '"');
 html = html.replace(/[^\x09\x0A\x0D\x20-\x7E]/g, (ch) => {
-  // оставим только стандартные управляющие, прочее выкинем
+ 
   return '';
 });
 
-// 1) Вырезаем любые наши старые тяжёлые блоки (сломанные) — по маркерам
+
 const KILL = [
   /<script[^>]*>[\s\S]*?(LOCAL HARD GUARD|UNIFIED FIX|ALLOWLIST|FAQ FIX|RC FAQ|MIRROR TOKEN DROPDOWN ICONS|MIRROR TOKEN DROPDOWN|MIRROR FAQ)[\s\S]*?<\/script>/gi,
   /<style[^>]*>[\s\S]*?MIRROR[\s\S]*?<\/style>/gi,
 ];
 for (const rx of KILL) html = html.replace(rx, '');
 
-// 2) Готовим чистые лёгкие вставки
+
 const MARK_GUARD = '/* MIRROR LEAN GUARD v1 (rewards) */';
 const MAIN_BASE  = 'http://localhost:8000/';
 
@@ -90,7 +90,7 @@ const FAQ_MINI = `
 })();
 </script>`;
 
-// 3) Вставляем перед </body>
+
 const i = html.lastIndexOf('</body>');
 if (i >= 0) {
   html = html.slice(0,i) + '\n' + GUARD + '\n' + FAQ_MINI + '\n</body>' + html.slice(i+7);
@@ -98,7 +98,7 @@ if (i >= 0) {
   html += GUARD + FAQ_MINI;
 }
 
-// 4) Сохраняем, если изменилось
+
 if (html !== original) {
   fs.writeFileSync(FILE + '.bakRepairRewards', original, 'utf8');
   fs.writeFileSync(FILE, html, 'utf8');

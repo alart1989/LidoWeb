@@ -1,4 +1,4 @@
-// token-dropdown-icons-v41-upgrade.js — заменить v4 на v4.1 (без мерцаний)
+
 const fs = require('fs');
 const path = require('path');
 const cheerio = require('cheerio');
@@ -76,7 +76,7 @@ const RUNTIME = `
 
   function setIcon(host, short){
     if (!host) return;
-    // если уже стоит эта иконка — не трогаем DOM (избегаем мерцаний)
+    
     if (host.dataset && host.dataset.token === short) return;
     host.dataset.token = short;
     host.innerHTML = (short === 'ETH') ? ICON_ETH : ICON_LIDO;
@@ -162,7 +162,7 @@ const RUNTIME = `
   }, true);
   document.addEventListener('keydown', function(e){ if (e.key==='Escape') closeAllMenus(); });
 
-  // спокойный наблюдатель: дебаунс через rAF
+ 
   var scheduled = false;
   var mo = new MutationObserver(function(){
     if (scheduled) return;
@@ -179,16 +179,16 @@ function upgrade(file){
   const html = fs.readFileSync(file, 'utf8');
   const $ = cheerio.load(html, { decodeEntities:false });
 
-  // удалить старый v4 блок, если есть
+  
   $('script').each((_,el)=>{
     const txt = $(el).html() || '';
     if (txt.includes(OLD_MARK)) $(el).remove();
   });
 
-  // если v4.1 уже стоит — пропускаем
+ 
   if ($.html().includes(NEW_MARK)) return false;
 
-  // вставить новый рантайм в конец <body>
+  
   const $body = $('body'); ($body.length ? $body : $.root()).append(RUNTIME);
 
   fs.writeFileSync(file + '.bakBeforeIconsV41', html, 'utf8');

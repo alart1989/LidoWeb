@@ -1,4 +1,4 @@
-// faq-standalone-toggle-v2.js — автономный FAQ (закрыт по умолчанию + раскрытие/сворачивание)
+
 const fs = require('fs');
 const path = require('path');
 const cheerio = require('cheerio');

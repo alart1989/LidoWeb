@@ -1,4 +1,4 @@
-// Восстанавливает *.bakBefore* -> оригинальные файлы
+
 const fs = require('fs'), path = require('path');
 
 function walk(dir, cb){

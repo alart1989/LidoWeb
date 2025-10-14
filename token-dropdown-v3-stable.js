@@ -1,4 +1,4 @@
-// token-dropdown-v3-stable.js — одно меню, устойчивое открытие, корректные значения/лейблы
+
 const fs = require('fs');
 const path = require('path');
 const cheerio = require('cheerio');
@@ -24,7 +24,7 @@ const RUNTIME = `
   var ICON_LIDO = ${JSON.stringify(ICON_LIDO)};
   var ICON_ETH  = ${JSON.stringify(ICON_ETH)};
 
-  // быстрый CSS + высокий z-index + отключение нативного листбокса
+
   var css = document.createElement('style');
   css.textContent = [
     'div[data-radix-portal] [role="listbox"], [role="listbox"][data-state="open"]{display:none!important;}',
@@ -59,7 +59,7 @@ const RUNTIME = `
     var tokenInput = root.querySelector('input[data-testid="drop-down"][readonly], input[name="token"][readonly]');
     if (tokenInput) setInputValue(tokenInput, lbl);
 
-    // подписи "… amount"
+ 
     document.querySelectorAll('.sc-esYiGF, .styles__InputStyle-sc-zr8x53-0 span, label span').forEach(function(el){
       var t = (el.textContent||'').trim();
       if (/^(stETH|wstETH|ETH) amount$/i.test(t)) el.textContent = short + ' amount';
@@ -102,7 +102,7 @@ const RUNTIME = `
   }
 
   function openMenuOnce(menu){
-    // откроем и поставим один «внешний» обработчик закрытия
+    
     menu.style.display = 'block';
     const closer = function(ev){
       if (ev.target.closest('.mirror-token-menu')) return;
@@ -117,20 +117,20 @@ const RUNTIME = `
     var root = tokenInput.closest('.sc-fBWQRz') || tokenInput.parentElement;
     if (!root || root.__mirrorV3) return;
 
-    // блокируем исходный input, чтобы не мешал
+    
     tokenInput.setAttribute('tabindex','-1');
     tokenInput.style.pointerEvents='none';
 
     var label = root.closest('label') || root;
     var iconHost = root.querySelector('.sc-eyvILC');
     if (iconHost){
-      // удалим чужие SVG, чтобы не мигали
+     
       Array.from(iconHost.querySelectorAll('svg')).forEach(s => s.remove());
     }
 
     var menu = makeMenu(label, function(short){ applyToken(root, short); });
 
-    // наш «прозрачный» триггер
+   
     var trigger = label.querySelector('.mirror-trigger');
     if (!trigger){
       trigger = document.createElement('button');
@@ -138,13 +138,13 @@ const RUNTIME = `
       label.appendChild(trigger);
     }
 
-    // открытие на pointerdown — быстрее и надёжнее click
+    
     trigger.addEventListener('pointerdown', function(e){
       e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
       openMenuOnce(menu);
     }, true);
 
-    // стартовое значение
+
     var start = load() || shortFromLabel(tokenInput.value || tokenInput.getAttribute('value'));
     applyToken(root, start);
 
@@ -167,7 +167,7 @@ function patch(file){
   let html = fs.readFileSync(file, 'utf8');
   if (html.includes(MARK)) return false;
 
-  // вставим перед </body>
+ 
   const i = html.lastIndexOf('</body>');
   const out = (i >= 0) ? html.slice(0, i) + RUNTIME + '\n</body>' + html.slice(i+7)
                        : html + '\n' + RUNTIME + '\n';

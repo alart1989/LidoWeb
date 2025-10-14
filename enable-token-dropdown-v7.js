@@ -1,4 +1,4 @@
-// enable-token-dropdown-v7.js — чистый выбор валюты (toggle по кнопке, без оверлеев)
+
 const fs = require('fs');
 const path = require('path');
 const cheerio = require('cheerio');

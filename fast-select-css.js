@@ -1,4 +1,4 @@
-// fast-select-css.js — инлайн-стиль, чтобы убрать нативный listbox и анимации
+
 const fs = require('fs');
 const path = require('path');
 
@@ -27,7 +27,7 @@ for (const file of PAGES) {
   let html = fs.readFileSync(file, 'utf8');
   if (html.includes(MARK)) continue;
 
-  // вставим перед </head>, если нет — в начало <body>
+ 
   const iHead = html.indexOf('</head>');
   if (iHead !== -1) {
     html = html.slice(0, iHead) + CSS + html.slice(iHead);

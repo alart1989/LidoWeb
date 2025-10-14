@@ -1,4 +1,4 @@
-// mirror-stable-bundle.js — один стабильный бандл (CSS kill-native + dropdown + FAQ)
+
 const fs = require('fs');
 const path = require('path');
 const cheerio = require('cheerio');
@@ -11,7 +11,7 @@ const PAGES = [
   'stake-site/withdrawals/claim/index.html',
 ].map(p => path.resolve(p));
 
-// маркеры старых наших вставок — вырежем их
+
 const OLD_MARKERS = [
   'MIRROR TOKEN DROPDOWN', 'MIRROR FAST SELECT CSS', 'LOCAL HARD GUARD',
   'FAQ FIX v', 'RC FAQ FIX', 'STAKE FAQ CLOSE STATIC', 'MIRROR STANDALONE FAQ',
@@ -224,11 +224,11 @@ function injectAll(file){
 
   stripOld($);
 
-  // вставим CSS в <head>, если он есть
+
   const hasHead = $('head').length>0;
   if (hasHead) $('head').append(CSS); else $.root().prepend(CSS);
 
-  // добавим DROPDOWN + FAQ перед </body>
+
   const body = $('body');
   (body.length?body:$.root()).append(DROPDOWN + FAQ);
 

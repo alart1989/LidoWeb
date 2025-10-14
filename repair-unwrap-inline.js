@@ -1,8 +1,8 @@
-// repair-unwrap-inline.js — чистит wrap/unwrap/index.html: удаляет битые инъекции и вставляет лёгкие версии
+
 const fs = require('fs');
 const path = require('path');
 
-const FILE = path.resolve('stake-site/unwrap/index.html'); // <- цель
+const FILE = path.resolve('stake-site/unwrap/index.html'); 
 if (!fs.existsSync(FILE)) {
   console.error('Файл не найден:', FILE);
   process.exit(1);
@@ -11,24 +11,24 @@ if (!fs.existsSync(FILE)) {
 let html = fs.readFileSync(FILE, 'utf8');
 const original = html;
 
-// 0) Санитизация невидимых символов / кавычек / BOM
+
 html = html.replace(/^\uFEFF/, '');
 html = html.replace(/\u00A0/g, ' ');
 html = html.replace(/[\u2018\u2019]/g, "'").replace(/[\u201C\u201D]/g, '"');
-// вычищаем странные управляющие в <script>
+
 html = html.replace(/<script>([\s\S]*?)<\/script>/g, (m, js) => {
   const cleaned = js.replace(/[^\x09\x0A\x0D\x20-\x7E]/g, '');
   return `<script>${cleaned}</script>`;
 });
 
-// 1) Сносим старые тяжёлые/битые вставки по маркерам
+
 const KILL = [
   /<script[^>]*>[\s\S]*?(LOCAL HARD GUARD|UNIFIED FIX|ALLOWLIST|FAQ FIX|RC FAQ|MIRROR TOKEN DROPDOWN ICONS|MIRROR TOKEN DROPDOWN|MIRROR FAQ)[\s\S]*?<\/script>/gi,
   /<style[^>]*>[\s\S]*?MIRROR[\s\S]*?<\/style>/gi,
 ];
 for (const rx of KILL) html = html.replace(rx, '');
 
-// 2) Добавляем лёгкий гард + мини-FAQ
+
 const MAIN_BASE  = 'http://localhost:8000/';
 const GUARD = `
 <script>
@@ -89,12 +89,11 @@ const FAQ_MINI = `
 })();
 </script>`;
 
-// 3) Вставляем перед </body>
+
 const i = html.lastIndexOf('</body>');
 if (i >= 0) html = html.slice(0,i) + '\n' + GUARD + '\n' + FAQ_MINI + '\n</body>' + html.slice(i+7);
 else html += GUARD + FAQ_MINI;
 
-// 4) Сохраняем
 if (html !== original) {
   fs.writeFileSync(FILE + '.bakRepairUnwrap', original, 'utf8');
   fs.writeFileSync(FILE, html, 'utf8');

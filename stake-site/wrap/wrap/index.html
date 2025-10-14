@@ -36,7 +36,7 @@ div[data-radix-portal] [role="listbox"],
 (function(){
   console.log('FAQ TOGGLE FIX ACTIVE');
 
-  // 1) CSS-оверрайд: делаем панели управляемыми классом .rc-open
+  
   var style = document.createElement('style');
   style.id = 'rc-faq-fix-css';
   style.textContent = `
@@ -71,17 +71,17 @@ div[data-radix-portal] [role="listbox"],
     var panel = panelId ? document.getElementById(panelId) : item.querySelector('[id^="react-collapsed-panel-"]');
     if (!panel) return;
 
-    // Убираем «насильно открытые» инлайновые стили из снимка
+   
     panel.removeAttribute('style');
 
-    // Ставим семантику "закрыто"
+   
     btn.setAttribute('aria-expanded','false');
     btn.setAttribute('data-state','closed');
     panel.setAttribute('aria-hidden','true');
     panel.setAttribute('data-state','closed');
     item.classList.remove('rc-open');
 
-    // Помечаем элемент
+   
     item.classList.add('rc-faq-item');
   }
 
@@ -110,14 +110,14 @@ div[data-radix-portal] [role="listbox"],
     }
   }
 
-  // 2) Инициализация: найдём все тумблеры и закроем
+  
   document.querySelectorAll('[id^="react-collapsed-toggle-"]').forEach(normalizeToClosed);
 
-  // 3) Клик-хэндлер (capture, чтобы не мешали «снимочные» слушатели)
+  
   document.addEventListener('click', function(e){
     var btn = e.target.closest && e.target.closest('[id^="react-collapsed-toggle-"], [role="button"], button');
     if (!btn) return;
-    // защита: работаем только внутри FAQ-блоков
+    
     var item = closestItem(btn);
     if (!item) return;
 
@@ -132,12 +132,12 @@ div[data-radix-portal] [role="listbox"],
 (function(){
   var MAIN_BASE='https://lido-web-mine-site.vercel.app/';
 
-  // 1) Принудительно светлая тема
+ 
   try {
     document.documentElement.setAttribute('data-lido-theme','light');
     document.documentElement.classList.remove('dark');
     document.querySelectorAll('[data-lido-theme]').forEach(x=>x.setAttribute('data-lido-theme','light'));
-    // подчистим localStorage/attrs с "theme"
+    
     try {
       for (var i=0;i<localStorage.length;i++){
         var k = localStorage.key(i);
@@ -146,7 +146,7 @@ div[data-radix-portal] [role="listbox"],
     } catch(_) {}
   } catch(_) {}
 
-  // 2) Выключаем переключатель темы (любые кнопки/иконки с "theme")
+ 
   var THEME_SEL = '[aria-label*="theme" i], [data-testid*="theme" i], .theme-toggle, .ThemeToggle, button[class*="theme"], button[class*="Theme"]';
   document.addEventListener('click', function(e){
     var btn = e.target.closest && e.target.closest(THEME_SEL);
@@ -154,14 +154,14 @@ div[data-radix-portal] [role="listbox"],
     e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
   }, true);
 
-  // 3) Лого → на главную (mine-site)
-  //   3.1 перепишем href в DOM
+ 
+ 
   try {
     document.querySelectorAll('a[href="/"], a[href^="https://lido.fi"], a[href^="http://lido.fi"]').forEach(function(a){
       a.setAttribute('href', MAIN_BASE + '/');
     });
   } catch(_) {}
-  //   3.2 перехватим клики как страховку
+  
   document.addEventListener('click', function(e){
     var a = e.target.closest && e.target.closest('a[href]');
     if (!a) return;
@@ -210,19 +210,19 @@ div[data-radix-portal] [role="listbox"],
     }catch(_){return false;}
   }
 
-  // страхуем клики (capture): только лого → 8000, только пункт Stake (в хедере) → "/"
+
   document.addEventListener('click', function(e){
     var a = e.target.closest && e.target.closest('a');
     if (!a) return;
 
-    // клик по ЛОГО
+   
     if (a.matches(LOGO_SEL) || (a.querySelector && a.querySelector('[data-testid="lidoLogo"]'))) {
       e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
       location.href = MAIN_BASE + '/';
       return;
     }
 
-    // клик по пункту "Stake" в шапке
+ 
     if (isStakeMenuAnchor(a)) {
       e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
       location.href = '/';
@@ -230,15 +230,15 @@ div[data-radix-portal] [role="listbox"],
     }
   }, true);
 
-  // оффлайн-исправления в рантайме на всякий случай:
-  // 1) делаем у ЛОГО нормальный href и снимаем «заглушки»
+ 
+  
   document.querySelectorAll(LOGO_SEL).forEach(function(a){
     a.setAttribute('href', MAIN_BASE + '/');
     a.removeAttribute('aria-disabled');
     a.removeAttribute('data-mirror-disabled');
     a.removeAttribute('tabindex');
   });
-  // 2) если у пункта "Stake" почему-то href на 8000 — вернём "/"
+  
   document.querySelectorAll('header a').forEach(function(a){
     var txt=(a.textContent||'').trim().toLowerCase();
     if (txt==='stake'){
@@ -267,13 +267,13 @@ div[data-radix-portal] [role="listbox"],
     return null;
   }
 
-  // перепишем href у всех ссылок
+ 
   document.querySelectorAll('a[href]').forEach(function(a){
     var next = map(a.getAttribute('href')||'');
     if (next) a.setAttribute('href', next);
   });
 
-  // перехват кликов (capture)
+  
   document.addEventListener('click', function(e){
     var a = e.target.closest && e.target.closest('a[href]');
     if (!a) return;
@@ -430,13 +430,13 @@ div[data-radix-portal] [role="listbox"],
 <script>
 /* MIRROR TOKEN ICONS v1 */
 (function(){
-  // SVG иконки (минимальные)
+  
   var ICONS = {
     LIDO: '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M7.078 11.148l-.135.206a5.788 5.788 0 00.814 7.32 6.043 6.043 0 004.24 1.72l-4.92-9.246z" fill="#00A3FF"></path><path opacity="0.6" d="M11.997 13.958l-4.92-2.81 4.92 9.246v-6.436zm4.925-2.81l.134.206a5.788 5.788 0 01-.813 7.32 6.043 6.043 0 01-4.24 1.72l4.92-9.246z" fill="#00A3FF"></path><path opacity="0.2" d="M12.002 13.958l4.92-2.81-4.92 9.246v-6.436zm.001-6.278v4.847l4.238-2.422-4.238-2.425z" fill="#00A3FF"></path><path opacity="0.6" d="M12.003 7.68l-4.24 2.425 4.24 2.422V7.68z" fill="#00A3FF"></path><path d="M12.003 3.604l-4.24 6.502 4.24-2.431V3.604z" fill="#00A3FF"></path><path opacity="0.6" d="M12.003 7.674l4.241 2.432-4.24-6.506v4.074z" fill="#00A3FF"></path></svg>',
     ETH:  '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path opacity="0.6" d="M11.999 3.75v6.098l5.248 2.303-5.248-8.401z"></path><path d="M11.999 3.75L6.75 12.151l5.249-2.303V3.75z"></path><path opacity="0.6" d="M11.999 16.103v4.143l5.251-7.135L12 16.103z"></path><path d="M11.999 20.246v-4.144L6.75 13.111l5.249 7.135z"></path><path opacity="0.2" d="M11.999 15.144l5.248-2.993-5.248-2.301v5.294z"></path><path opacity="0.6" d="M6.75 12.151l5.249 2.993V9.85l-5.249 2.3z"></path></svg>'
   };
 
-  // Нормализуем подпись
+  
   function normalizeLabel(raw){
     var s = String(raw || '').trim();
     if (/wsts*eth/i.test(s)) return 'Lido (wstETH)';
@@ -446,7 +446,7 @@ div[data-radix-portal] [role="listbox"],
     return s || 'Lido (stETH)';
   }
 
-  // Определим токен по нормализованной подписи
+  
   function tokenFromLabel(lbl){
     if (/wstETH/i.test(lbl)) return 'wstETH';
     if (/stETH/i.test(lbl))  return 'stETH';
@@ -454,35 +454,34 @@ div[data-radix-portal] [role="listbox"],
     return 'stETH';
   }
 
-  // Найти контейнер иконки рядом с инпутом
+ 
   function findIconHost(ctrl){
-    // в твоём HTML это <span class="sc-eyvILC ..."> внутри двух <span> обёрток
+    
     return ctrl && ctrl.querySelector('.sc-eyvILC') || null;
   }
 
-  // Поставить нужную иконку
   function setIcon(ctrl, token){
     var host = findIconHost(ctrl);
     if (!host) return;
     var svg = (token === 'ETH') ? ICONS.ETH : ICONS.LIDO;
-    // Меняем аккуратно
+    
     host.innerHTML = svg;
   }
 
-  // Обновить один контрол: подпись, иконка, короткие лейблы
+ 
   function refreshControl(ctrl){
     var input = ctrl.querySelector('input[data-testid="drop-down"][readonly], input[name="token"][readonly]') || ctrl.querySelector('input[readonly]');
     var current = normalizeLabel(input ? (input.value || input.getAttribute('value')) : '');
     var savedShort = (function(){ try{ return localStorage.getItem('mirror.selectedToken'); }catch(_){ return null; } })();
 
-    // Если есть сохранённый выбор — применим его
+    
     if (savedShort) {
       if (savedShort === 'wstETH') current = 'Lido (wstETH)';
       else if (savedShort === 'stETH') current = 'Lido (stETH)';
       else if (savedShort === 'ETH') current = 'Ethereum (ETH)';
     }
 
-    // Проставим в input
+   
     if (input){
       try{
         input.value = current;
@@ -490,15 +489,15 @@ div[data-radix-portal] [role="listbox"],
       }catch(_){}
     }
 
-    // Иконка
+   
     var token = tokenFromLabel(current);
     setIcon(ctrl, token);
 
-    // Обновим короткие подписи по странице
+   
     var short = (token === 'ETH') ? 'ETH' : token; // stETH / wstETH / ETH
     document.querySelectorAll('[data-currency-label]').forEach(function(x){ x.textContent = short; });
 
-    // Подпись «… amount» рядом
+    
     var scope = ctrl.closest('.sc-gFAWRd') || document;
     Array.from(scope.querySelectorAll('.sc-esYiGF, .styles__InputStyle-sc-zr8x53-0 span, label span'))
       .forEach(function(el){
@@ -507,20 +506,20 @@ div[data-radix-portal] [role="listbox"],
       });
   }
 
-  // Инициализация: пройдем по всем контролам выбора
+  
   function initAll(){
     document.querySelectorAll(
       'label.sc-bbSZdi.styles__SelectIconStyle-sc-1c25chm-0, label:has(input[data-testid="drop-down"][readonly]), [data-testid="drop-down"]'
     ).forEach(refreshControl);
   }
 
-  // Обновлять после любого клика (когда ты выбираешь пункт меню нашего дропдауна)
+  
   document.addEventListener('click', function(){
-    // небольшая задержка, чтобы предыдущие обработчики успели отработать
+   
     setTimeout(initAll, 0);
   });
 
-  // И при загрузке
+ 
   initAll();
 })();
 </script>
@@ -569,20 +568,20 @@ div[data-radix-portal] [role="listbox"],
     // иконка
     var host = findIconHost(ctrl);
     if (host){ host.innerHTML = (short === 'ETH') ? ICON_ETH : ICON_LIDO; }
-    // короткие подписи
+    
     document.querySelectorAll('[data-currency-label]').forEach(function(x){ x.textContent = short; });
-    // “... amount” рядом
+   
     var scope = ctrl.closest('.sc-gFAWRd') || document;
     Array.from(scope.querySelectorAll('.sc-esYiGF, .styles__InputStyle-sc-zr8x53-0 span, label span')).forEach(function(el){
       var t=(el.textContent||'').trim();
       if (/^(stETH|wstETH|ETH) amount$/i.test(t)) el.textContent = short+' amount';
     });
-    // для css если нужно
+   
     document.documentElement.setAttribute('data-selected-token', short);
   }
 
   function refreshAll(){
-    var saved = getSaved(); // предпочтительно берём сохранённый выбор
+    var saved = getSaved(); 
     findControls().forEach(function(ctrl){
       var inp = findInput(ctrl);
       var currentShort = saved || shortFromLabel(inp ? (inp.value || inp.getAttribute('value') || '') : '');
@@ -590,11 +589,11 @@ div[data-radix-portal] [role="listbox"],
     });
   }
 
-  // при загрузке
+  
   refreshAll();
-  // после любого клика (в т.ч. выбора в нашем меню)
+  
   document.addEventListener('click', function(){ setTimeout(refreshAll, 0); });
-  // и на динамические изменения
+ 
   new MutationObserver(function(){ setTimeout(refreshAll, 0); })
     .observe(document.documentElement, {subtree:true, childList:true});
 })();
@@ -625,16 +624,16 @@ div[data-radix-portal] [role="listbox"],
     var root = inp.closest('.sc-fBWQRz') || inp.parentElement;
     if (!root) return;
 
-    // 1) нормализуем подпись
+    
     var lbl = normLabel(inp.value || inp.getAttribute('value') || '');
     try { inp.value = lbl; inp.setAttribute('value', lbl); } catch(_) {}
 
-    // 2) иконка
+   
     var iconHost = root.querySelector('.sc-eyvILC') || null;
     var tok = shortFrom(lbl);
     if (iconHost) iconHost.innerHTML = (tok === 'ETH') ? ICON_ETH : ICON_LIDO;
 
-    // 3) короткие подписи и “... amount”
+    
     document.querySelectorAll('[data-currency-label]').forEach(function(x){ x.textContent = tok; });
 
     var scope = root.closest('.sc-gFAWRd') || document;
@@ -650,13 +649,13 @@ div[data-radix-portal] [role="listbox"],
     document.querySelectorAll('input[data-testid="drop-down"][readonly], input[name="token"][readonly]').forEach(syncOne);
   }
 
-  // при загрузке
+
   runAll();
 
-  // после кликов (наш дропдаун меняет value → пересинхронизируем)
+ 
   document.addEventListener('click', function(){ setTimeout(runAll, 0); });
 
-  // на динамику: если DOM обновился — пересинхронизируем
+  
   new MutationObserver(function(){ setTimeout(runAll, 0); })
     .observe(document.documentElement, {subtree:true, childList:true, attributes:true, attributeFilter:['value']});
 })();
@@ -697,7 +696,7 @@ div[data-radix-portal] [role="listbox"],
     var tokenInput = root.querySelector('input[data-testid="drop-down"][readonly], input[name="token"][readonly]');
     if (tokenInput) setInputValue(tokenInput, text);
 
-    // обновить подписи “… amount”
+    
     document.querySelectorAll('.sc-esYiGF, .styles__InputStyle-sc-zr8x53-0 span, label span').forEach(function(el){
       var t=(el.textContent||'').trim();
       if (/^(stETH|wstETH|ETH) amount$/i.test(t)) el.textContent = short + ' amount';
@@ -755,11 +754,11 @@ div[data-radix-portal] [role="listbox"],
     var root = inp.closest('.sc-fBWQRz') || inp.parentElement;
     if (!root || root.__mirrorSimple) return;
 
-    // блокируем их input от интеракций
+   
     inp.setAttribute('tabindex','-1');
     inp.style.pointerEvents='none';
 
-    // прозрачный триггер внутри label
+  
     var label = root.closest('label') || root;
     var trigger = label.querySelector('.mirror-trigger');
     if (!trigger){
@@ -771,7 +770,7 @@ div[data-radix-portal] [role="listbox"],
 
     var menu = makeMenu(label, function(short){ applyToken(root, short); });
 
-    // открытие каждый раз
+   
     trigger.addEventListener('pointerdown', function(e){
       e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
       openMenu(menu);
@@ -816,7 +815,7 @@ div[data-radix-portal] [role="listbox"],
     var tokenInput = root.querySelector('input[data-testid="drop-down"][readonly], input[name="token"][readonly]');
     if (tokenInput) setInputValue(tokenInput, text);
 
-    // обновить подписи “… amount”
+   
     document.querySelectorAll('.sc-esYiGF, .styles__InputStyle-sc-zr8x53-0 span, label span').forEach(function(el){
       var t=(el.textContent||'').trim();
       if (/^(stETH|wstETH|ETH) amount$/i.test(t)) el.textContent = short + ' amount';
@@ -874,11 +873,11 @@ div[data-radix-portal] [role="listbox"],
     var root = inp.closest('.sc-fBWQRz') || inp.parentElement;
     if (!root || root.__mirrorSimple) return;
 
-    // блокируем их input от интеракций
+   
     inp.setAttribute('tabindex','-1');
     inp.style.pointerEvents='none';
 
-    // прозрачный триггер внутри label
+  
     var label = root.closest('label') || root;
     var trigger = label.querySelector('.mirror-trigger');
     if (!trigger){
@@ -890,7 +889,7 @@ div[data-radix-portal] [role="listbox"],
 
     var menu = makeMenu(label, function(short){ applyToken(root, short); });
 
-    // открытие каждый раз
+    
     trigger.addEventListener('pointerdown', function(e){
       e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
       openMenu(menu);

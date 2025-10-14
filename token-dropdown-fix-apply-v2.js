@@ -1,4 +1,4 @@
-// token-dropdown-fix-apply-v2.js — надёжное открытие + правильное обновление значения
+
 const fs = require('fs');
 const path = require('path');
 const cheerio = require('cheerio');
@@ -81,15 +81,15 @@ ${MARK}
       label.appendChild(trigger);
     }
 
-    // блокируем исходный input от кликов
+   
     tokenInput.setAttribute('tabindex','-1');
     tokenInput.style.pointerEvents='none';
 
-    // текущее значение
+   
     const startShort = load() || shortFromLabel(tokenInput.value || tokenInput.getAttribute('value'));
     applyToken(label, startShort);
 
-    // надёжное открытие: сначала mousedown → предотвратить «внешнее закрытие», затем показать меню
+  
     trigger.addEventListener('mousedown', function(e){
       e.preventDefault(); e.stopPropagation();
       if (menu){
@@ -97,7 +97,7 @@ ${MARK}
       }
     }, true);
 
-    // выбор пункта (делегирование внутри меню)
+   
     if (menu){
       menu.addEventListener('mousedown', function(e){
         const btn = e.target.closest('.mirror-token-item');
@@ -110,7 +110,7 @@ ${MARK}
       });
     }
 
-    // клик вне — закрыть меню
+  
     document.addEventListener('mousedown', function(ev){
       if (!menu) return;
       if (ev.target.closest('.mirror-token-menu') || ev.target.closest('.mirror-trigger')) return;
@@ -136,7 +136,7 @@ function patch(file){
   let html = fs.readFileSync(file, 'utf8');
   if (html.includes(MARK)) return false;
 
-  // вставим перед </body>
+  
   const i = html.lastIndexOf('</body>');
   const out = (i >= 0) ? html.slice(0, i) + RUNTIME + '\\n</body>' + html.slice(i+7) : (html + '\\n' + RUNTIME + '\\n');
 

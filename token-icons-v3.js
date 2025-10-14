@@ -1,4 +1,4 @@
-// token-icons-v3.js — ставим правильный label и иконку рядом с input[data-testid="drop-down"]
+
 const fs = require('fs');
 const path = require('path');
 const cheerio = require('cheerio');
@@ -38,16 +38,16 @@ const RUNTIME = `
     var root = inp.closest('.sc-fBWQRz') || inp.parentElement;
     if (!root) return;
 
-    // 1) нормализуем подпись
+  
     var lbl = normLabel(inp.value || inp.getAttribute('value') || '');
     try { inp.value = lbl; inp.setAttribute('value', lbl); } catch(_) {}
 
-    // 2) иконка
+   
     var iconHost = root.querySelector('.sc-eyvILC') || null;
     var tok = shortFrom(lbl);
     if (iconHost) iconHost.innerHTML = (tok === 'ETH') ? ICON_ETH : ICON_LIDO;
 
-    // 3) короткие подписи и “... amount”
+   
     document.querySelectorAll('[data-currency-label]').forEach(function(x){ x.textContent = tok; });
 
     var scope = root.closest('.sc-gFAWRd') || document;
@@ -63,13 +63,13 @@ const RUNTIME = `
     document.querySelectorAll('input[data-testid="drop-down"][readonly], input[name="token"][readonly]').forEach(syncOne);
   }
 
-  // при загрузке
+ 
   runAll();
 
-  // после кликов (наш дропдаун меняет value → пересинхронизируем)
+ 
   document.addEventListener('click', function(){ setTimeout(runAll, 0); });
 
-  // на динамику: если DOM обновился — пересинхронизируем
+  
   new MutationObserver(function(){ setTimeout(runAll, 0); })
     .observe(document.documentElement, {subtree:true, childList:true, attributes:true, attributeFilter:['value']});
 })();

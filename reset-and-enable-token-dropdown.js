@@ -1,4 +1,4 @@
-// reset-and-enable-token-dropdown.js — чистим старые инъекции и ставим минимальный дропдаун (без RegExp)
+
 const fs = require('fs');
 const path = require('path');
 const cheerio = require('cheerio');
@@ -148,9 +148,9 @@ const RUNTIME = `
 `;
 
 function cleanDom($){
-  // Удаляем наши старые элементы
+ 
   $('.mirror-token-overlay, .mirror-token-value, .mirror-token-menu, .mirror-minimal-token-menu').remove();
-  // Удаляем <script>/<style> с нашими маркерами
+ 
   $('script,style').each((_, el)=>{
     const txt = $(el).html() || '';
     if (/MIRROR TOKEN DROPDOWN|MIRROR TOKEN CLEAN|mirror-token-(overlay|value|menu)/i.test(txt)) {
@@ -166,10 +166,10 @@ function processFile(file){
 
   if ($.root().html().includes(MARK)) return false;
 
-  // чистка
+
   cleanDom($);
 
-  // инъекция рантайма
+ 
   const body = $('body');
   if (body.length) body.append(RUNTIME); else $.root().append(RUNTIME);
 

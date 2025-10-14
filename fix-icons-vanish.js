@@ -1,4 +1,4 @@
-// fix-icons-vanish.js — не удаляем свои SVG и гарантируем вставку
+
 const fs = require('fs'), path = require('path');
 
 const FILES = [
@@ -13,8 +13,7 @@ for (const f of FILES) {
   let html = fs.readFileSync(f, 'utf8');
   const before = html;
 
-  // 1) В рантайме ищем опасный фрагмент, который удаляет все SVG
-  //    и заменяем его на «удали только не-наши».
+
   html = html.replace(
     /Array\.from\(iconHost\.querySelectorAll\('svg'\)\)\.forEach\(s=>s\.remove\(\)\);/g,
     `Array.from(iconHost.querySelectorAll('svg')).forEach(function(s){
@@ -22,9 +21,9 @@ for (const f of FILES) {
      });`
   );
 
-  // 2) На всякий добавим «гарантию», что наши иконки есть (если блок уже есть, не дублируем)
+ 
   if (!/mirror-ico-wrap/.test(html)) {
-    // в некоторых версиях блок вставляется строкой; если его не нашли — добавим в applyToken после вычисления iconHost
+    
     html = html.replace(
       /var iconHost = root\.querySelector\('\.sc-eyvILC'\);\s*if \(iconHost\)\{\s*/g,
       `var iconHost = root.querySelector('.sc-eyvILC'); if (iconHost){
